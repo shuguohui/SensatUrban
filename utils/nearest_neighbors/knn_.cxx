@@ -21,7 +21,7 @@ using namespace std;
 
 void cpp_knn(const float* points, const size_t npts, const size_t dim, 
 			const float* queries, const size_t nqueries,
-			const size_t K, long* indices){
+			const size_t K, long long* indices){
 
 	// create the kdtree
 	typedef KDTreeTableAdaptor< float, float> KDTree;
@@ -38,14 +38,14 @@ void cpp_knn(const float* points, const size_t npts, const size_t dim,
 		resultSet.init(&out_ids[0], &out_dists_sqr[0] );
 		mat_index.index->findNeighbors(resultSet, &queries[i*dim], nanoflann::SearchParams(10));
 		for(size_t j=0; j<K; j++){
-			indices[i*K+j] = long(out_ids[j]);
+			indices[i*K+j] = long long(out_ids[j]);
 		}
 	}
 }
 
 void cpp_knn_omp(const float* points, const size_t npts, const size_t dim, 
 			const float* queries, const size_t nqueries,
-			const size_t K, long* indices){
+			const size_t K, long long* indices){
 
 	// create the kdtree
 	typedef KDTreeTableAdaptor< float, float> KDTree;
@@ -63,7 +63,7 @@ void cpp_knn_omp(const float* points, const size_t npts, const size_t dim,
 		resultSet.init(&out_ids[0], &out_dists_sqr[0] );
 		mat_index.index->findNeighbors(resultSet, &queries[i*dim], nanoflann::SearchParams(10));
 		for(size_t j=0; j<K; j++){
-			indices[i*K+j] = long(out_ids[j]);
+			indices[i*K+j] = long long(out_ids[j]);
 		}
 	}
 }
@@ -71,12 +71,12 @@ void cpp_knn_omp(const float* points, const size_t npts, const size_t dim,
 
 void cpp_knn_batch(const float* batch_data, const size_t batch_size, const size_t npts, const size_t dim,
 			const float* queries, const size_t nqueries,
-			const size_t K, long* batch_indices){
+			const size_t K, long long* batch_indices){
 
 	for(size_t bid=0; bid < batch_size; bid++){
 
 		const float* points = &batch_data[bid*npts*dim];
-		long* indices = &batch_indices[bid*nqueries*K];
+		long long* indices = &batch_indices[bid*nqueries*K];
 
 		// create the kdtree
 		typedef KDTreeTableAdaptor< float, float> KDTree;
@@ -93,7 +93,7 @@ void cpp_knn_batch(const float* batch_data, const size_t batch_size, const size_
 			resultSet.init(&out_ids[0], &out_dists_sqr[0] );
 			mat_index.index->findNeighbors(resultSet, &queries[bid*nqueries*dim + i*dim], nanoflann::SearchParams(10));
 			for(size_t j=0; j<K; j++){
-				indices[i*K+j] = long(out_ids[j]);
+				indices[i*K+j] = long long(out_ids[j]);
 			}
 		}
 
@@ -103,13 +103,13 @@ void cpp_knn_batch(const float* batch_data, const size_t batch_size, const size_
 
 void cpp_knn_batch_omp(const float* batch_data, const size_t batch_size, const size_t npts, const size_t dim, 
 				const float* queries, const size_t nqueries,
-				const size_t K, long* batch_indices){
+				const size_t K, long long* batch_indices){
 
 # pragma omp parallel for
 	for(size_t bid=0; bid < batch_size; bid++){
 
 		const float* points = &batch_data[bid*npts*dim];
-		long* indices = &batch_indices[bid*nqueries*K];
+		long long* indices = &batch_indices[bid*nqueries*K];
 
 		// create the kdtree
 		typedef KDTreeTableAdaptor< float, float> KDTree;
@@ -126,7 +126,7 @@ void cpp_knn_batch_omp(const float* batch_data, const size_t batch_size, const s
 			resultSet.init(&out_ids[0], &out_dists_sqr[0] );
 			mat_index.index->findNeighbors(resultSet, &queries[bid*nqueries*dim + i*dim], nanoflann::SearchParams(10));
 			for(size_t j=0; j<K; j++){
-				indices[i*K+j] = long(out_ids[j]);
+				indices[i*K+j] = long long(out_ids[j]);
 			}
 		}
 
@@ -137,7 +137,7 @@ void cpp_knn_batch_omp(const float* batch_data, const size_t batch_size, const s
 
 void cpp_knn_batch_distance_pick(const float* batch_data, const size_t batch_size, const size_t npts, const size_t dim, 
 				float* batch_queries, const size_t nqueries,
-				const size_t K, long* batch_indices)
+				const size_t K, long long* batch_indices)
 {
 
 	mt19937 mt_rand(time(0));
@@ -145,7 +145,7 @@ void cpp_knn_batch_distance_pick(const float* batch_data, const size_t batch_siz
 	for(size_t bid=0; bid < batch_size; bid++){
 
 		const float* points = &batch_data[bid*npts*dim];
-		// long* indices = &batch_indices[bid*nqueries*K];
+		// long long* indices = &batch_indices[bid*nqueries*K];
 		// float* queries = &batch_queries[bid*nqueries*dim];
 
 		// create the kdtree
@@ -204,7 +204,7 @@ void cpp_knn_batch_distance_pick(const float* batch_data, const size_t batch_siz
 
 void cpp_knn_batch_distance_pick_omp(const float* batch_data, const size_t batch_size, const size_t npts, const size_t dim, 
 				float* batch_queries, const size_t nqueries,
-				const size_t K, long* batch_indices)
+				const size_t K, long long* batch_indices)
 {
 
 	mt19937 mt_rand(time(0));
@@ -213,7 +213,7 @@ void cpp_knn_batch_distance_pick_omp(const float* batch_data, const size_t batch
 	for(size_t bid=0; bid < batch_size; bid++){
 
 		const float* points = &batch_data[bid*npts*dim];
-		// long* indices = &batch_indices[bid*nqueries*K];
+		// long long* indices = &batch_indices[bid*nqueries*K];
 		// float* queries = &batch_queries[bid*nqueries*dim];
 
 		// create the kdtree

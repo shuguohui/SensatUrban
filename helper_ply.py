@@ -25,7 +25,7 @@
 # Basic libs
 import numpy as np
 import sys
-
+import os
 
 # Define PLY types
 ply_dtypes = dict([
@@ -272,6 +272,8 @@ def write_ply(filename, field_list, field_names, triangular_faces=None):
     if not filename.endswith('.ply'):
         filename += '.ply'
 
+   # if(not os.path.exists(os.path.dirname(filename))):
+    #    os.makedirs(os.path.dirname(filename))
     # open in text mode to write the header
     with open(filename, 'w') as plyfile:
 

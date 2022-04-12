@@ -8,27 +8,27 @@ import cython
 cdef extern from "knn_.h":
     void cpp_knn(const float* points, const size_t npts, const size_t dim, 
 			const float* queries, const size_t nqueries,
-			const size_t K, long* indices)
+			const size_t K, long long* indices)
 
     void cpp_knn_omp(const float* points, const size_t npts, const size_t dim, 
                 const float* queries, const size_t nqueries,
-                const size_t K, long* indices)
+                const size_t K, long long* indices)
 
     void cpp_knn_batch(const float* batch_data, const size_t batch_size, const size_t npts, const size_t dim,
                 const float* queries, const size_t nqueries,
-                const size_t K, long* batch_indices)
+                const size_t K, long long* batch_indices)
 
     void cpp_knn_batch_omp(const float* batch_data, const size_t batch_size, const size_t npts, const size_t dim, 
                     const float* queries, const size_t nqueries,
-                    const size_t K, long* batch_indices)
+                    const size_t K, long long* batch_indices)
 
     void cpp_knn_batch_distance_pick(const float* batch_data, const size_t batch_size, const size_t npts, const size_t dim, 
                     float* queries, const size_t nqueries,
-                    const size_t K, long* batch_indices)
+                    const size_t K, long long* batch_indices)
         
     void cpp_knn_batch_distance_pick_omp(const float* batch_data, const size_t batch_size, const size_t npts, const size_t dim, 
 				float* batch_queries, const size_t nqueries,
-				const size_t K, long* batch_indices)
+				const size_t K, long long* batch_indices)
 
 def knn(pts, queries, K, omp=False):
 
@@ -60,11 +60,11 @@ def knn(pts, queries, K, omp=False):
     if omp:
         cpp_knn_omp(<float*> pts_cpp.data, npts, dim, 
                 <float*> queries_cpp.data, nqueries,
-                K_cpp, <long*> indices_cpp.data)
+                K_cpp, <long long*> indices_cpp.data)
     else:
         cpp_knn(<float*> pts_cpp.data, npts, dim,
                 <float*> queries_cpp.data, nqueries,
-                K_cpp, <long*> indices_cpp.data)
+                K_cpp, <long long*> indices_cpp.data)
 
     return indices
 
@@ -100,11 +100,11 @@ def knn_batch(pts, queries, K, omp=False):
     if omp:
         cpp_knn_batch_omp(<float*> pts_cpp.data, batch_size, npts, dim, 
                 <float*> queries_cpp.data, nqueries,
-                K_cpp, <long*> indices_cpp.data)
+                K_cpp, <long long*> indices_cpp.data)
     else:
         cpp_knn_batch(<float*> pts_cpp.data, batch_size, npts, dim,
                 <float*> queries_cpp.data, nqueries,
-                K_cpp, <long*> indices_cpp.data)
+                K_cpp, <long long*> indices_cpp.data)
 
     return indices
 
@@ -130,7 +130,7 @@ def knn_batch_distance_pick(pts, nqueries, K, omp=False):
     K_cpp = K
 
     # create indices tensor
-    indices = np.zeros((pts.shape[0], nqueries, K), dtype=np.long)
+    indices = np.zeros((pts.shape[0], nqueries, K), dtype=np.longlong)
     queries = np.zeros((pts.shape[0], nqueries, dim), dtype=np.float32)
 
     pts_cpp = np.ascontiguousarray(pts, dtype=np.float32)
@@ -140,10 +140,10 @@ def knn_batch_distance_pick(pts, nqueries, K, omp=False):
     if omp:
         cpp_knn_batch_distance_pick_omp(<float*> pts_cpp.data, batch_size, npts, dim,
             <float*> queries_cpp.data, nqueries,
-            K_cpp, <long*> indices_cpp.data)
+            K_cpp, <long long*> indices_cpp.data)
     else:
         cpp_knn_batch_distance_pick(<float*> pts_cpp.data, batch_size, npts, dim,
             <float*> queries_cpp.data, nqueries,
-            K_cpp, <long*> indices_cpp.data)
+            K_cpp, <long long*> indices_cpp.data)
 
     return indices, queries

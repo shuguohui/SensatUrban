@@ -1,6 +1,7 @@
 from os import makedirs, system
 from os.path import exists, join, dirname, abspath
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 import numpy as np
 import time
 
@@ -48,6 +49,7 @@ class ModelTester:
 
         # Test saving path
         saving_path = time.strftime('results/Log_%Y-%m-%d_%H-%M-%S', time.gmtime())
+        saving_path = saving_path.replace('\\','/')
         test_path = join('test', saving_path.split('/')[-1])
         makedirs(test_path) if not exists(test_path) else None
         makedirs(join(test_path, 'test_preds')) if not exists(join(test_path, 'test_preds')) else None

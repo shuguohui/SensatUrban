@@ -2,7 +2,8 @@ from os.path import exists, join
 from os import makedirs
 from sklearn.metrics import confusion_matrix
 from tool import DataProcessing as DP
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 import numpy as np
 import tf_util
 import time

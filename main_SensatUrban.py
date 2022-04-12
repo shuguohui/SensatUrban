@@ -5,7 +5,8 @@ from helper_ply import read_ply
 from tool import ConfigSensatUrban as cfg
 from tool import DataProcessing as DP
 from tool import Plot
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 import numpy as np
 import time, pickle, argparse, glob, os, shutil
 
@@ -13,8 +14,10 @@ import time, pickle, argparse, glob, os, shutil
 class SensatUrban:
     def __init__(self):
         self.name = 'SensatUrban'
-        root_path = '/media/qingyong/data/Dataset'  # path to the dataset
+        root_path = 'D:/Code/SensatUrban/dataset'  # path to the dataset
         self.path = join(root_path, self.name)
+        self.path = self.path.replace('\\','/')
+        print(self.path)
         self.label_to_names = {0: 'Ground', 1: 'High Vegetation', 2: 'Buildings', 3: 'Walls',
                                4: 'Bridge', 5: 'Parking', 6: 'Rail', 7: 'traffic Roads', 8: 'Street Furniture',
                                9: 'Cars', 10: 'Footpath', 11: 'Bikes', 12: 'Water'}
@@ -54,6 +57,7 @@ class SensatUrban:
 
         for i, file_path in enumerate(self.all_files):
             t0 = time.time()
+            file_path = file_path.replace('\\','/')
             cloud_name = file_path.split('/')[-1][:-4]
             if cloud_name in self.test_file_name:
                 cloud_split = 'test'
@@ -64,6 +68,7 @@ class SensatUrban:
 
             # Name of the input files
             kd_tree_file = join(tree_path, '{:s}_KDTree.pkl'.format(cloud_name))
+            kd_tree_file = kd_tree_file.replace('\\','/')
             sub_ply_file = join(tree_path, '{:s}.ply'.format(cloud_name))
 
             data = read_ply(sub_ply_file)
@@ -92,6 +97,7 @@ class SensatUrban:
 
         for i, file_path in enumerate(self.all_files):
             t0 = time.time()
+            file_path = file_path.replace('\\','/')
             cloud_name = file_path.split('/')[-1][:-4]
 
             # val projection and labels
@@ -248,7 +254,7 @@ if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = str(FLAGS.gpu)
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
     Mode = FLAGS.mode
-
+    time1 = time.time()
     shutil.rmtree('__pycache__') if exists('__pycache__') else None
     if Mode == 'train':
         shutil.rmtree('results') if exists('results') else None
@@ -288,3 +294,6 @@ if __name__ == '__main__':
                 sub_xyz = data_list[1]
                 label = data_list[21]
                 Plot.draw_pc_sem_ins(xyz[0, :, :], label[0, :])
+    
+    time2 = time.time()
+    print("Total Time = ", (time2 - time1) , "s")
